@@ -29,8 +29,7 @@
     <property name="styleSheet">
      <string notr="true">background: #28262b;
 border-radius: 25px;
-border: 2px solid #65606C;
-box-shadow: 0px 0px 106px -35px rgba(0,0,0,0.49);</string>
+border: 2px solid #65606C;</string>
     </property>
     <property name="frameShape">
      <enum>QFrame::StyledPanel</enum>
