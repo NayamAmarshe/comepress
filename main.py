@@ -1,12 +1,12 @@
-import sys
-from PyQt5.QtWidgets import *
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5 import uic
+import glob
 import os
-from pathlib import Path
 import shutil
-from PIL import Image
+import sys
+from pathlib import Path
 
+from PIL import Image
+from PyQt5 import QtCore, QtGui, QtWidgets, uic
+from PyQt5.QtWidgets import *
 
 mode = "folder"  # or "folder"
 
@@ -84,10 +84,25 @@ class MyGUI(QMainWindow):
         # Get folder name
         self.folder_name = os.path.basename(self.folder_path)
         # Destination backup
-        backup_destination = os.path.abspath(self.folder_path + "_backup")
+        if os.path.isdir(self.folder_path + "_comepress_backup"):
+            shutil.rmtree(self.folder_path + "_comepress_backup")
+        backup_destination = os.path.abspath(
+            self.folder_path + "_comepress_backup")
         # Backup folder
         shutil.copytree(self.folder_path, backup_destination,
                         ignore=ignore_list)
+
+        # Loop through all the files in the folder
+        for root, dirs, files in os.walk(self.folder_path):
+            for file in files:
+                # If file is an image
+                if file.endswith(tuple([".jpg", ".jpeg", ".png"])):
+                    # Convert to WebP
+                    img = Image.open(root + "/" + file)
+                    img = img.save(root + "/" + file.rsplit(".", 1)
+                                   [0] + ".webp", "webp")
+                    # Remove original file
+                    os.remove(root + "/" + file)
 
 
 def main():
