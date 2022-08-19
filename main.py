@@ -1,31 +1,49 @@
+import fnmatch
 import glob
 import os
 import shutil
 import sys
+from os.path import isdir, join
 from pathlib import Path
 
 from PIL import Image
+from pynput.keyboard import Key, Listener
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
+from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import *
 
 mode = "folder"  # or "folder"
 
 
+def restart_program():
+    python = sys.executable
+    os.execl(python, python, * sys.argv)
+
+
+def include_patterns(*patterns):
+    def _ignore_patterns(path, all_names):
+        # Determine names which match one or more patterns (that shouldn't be
+        # ignored).
+        keep = (name for pattern in patterns
+                for name in fnmatch.filter(all_names, pattern))
+        # Ignore file names which *didn't* match any of the patterns given that
+        # aren't directory names.
+        dir_names = (name for name in all_names if isdir(join(path, name)))
+        return set(all_names) - set(keep) - set(dir_names)
+
+    return _ignore_patterns
+
+
 def ignore_list(path, files):
-
     filesToIgnore = []
-
     for fileName in files:
-
         fullFileName = os.path.join(os.path.normpath(path), fileName)
-
         if (not os.path.isdir(fullFileName)
             and not fileName.endswith('jpg')
             and not fileName.endswith('jpeg')
             and not fileName.endswith('png')
                 and not fileName.endswith('mp4')):
             filesToIgnore.append(fileName)
-
     return filesToIgnore
 
 
@@ -33,22 +51,57 @@ class MyGUI(QMainWindow):
     def __init__(self):
         super(MyGUI, self).__init__()
         uic.loadUi("comepress.ui", self)
+
         # Remove Titlebar and background
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-        # Get button
+        self.setStyleSheet("""QToolTip { 
+                           border: none; 
+                           color: white; 
+                           }""")
+        # BUTTONS
         self.pushButton.clicked.connect(self.browse)
+
+        self.checkBox.clicked.connect(self.checked)
+        self.checkBox.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
+
+        self.closeButton.clicked.connect(self.close)
+        self.closeButton.setToolTip("Close")
+        self.closeButton.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
+
+        self.minimizeButton.clicked.connect(self.showMinimized)
+        self.minimizeButton.setToolTip("Minimize")
+        self.minimizeButton.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
+
         self.setAcceptDrops(True)
+
+        # DEFAULT VARIABLES
+        self.backup = True
+        self.dragPos = QtCore.QPoint()
+
         self.show()
 
-    def browse(self):
-        if mode == "files":
-            self.file_paths = QtWidgets.QFileDialog.getOpenFileNames(
-                self, "Select Files")[0]
-            print(self.file_paths)
+    def mousePressEvent(self, event):
+        self.dragPos = event.globalPos()
+
+    def mouseMoveEvent(self, event):
+        if event.buttons() == QtCore.Qt.LeftButton:
+            self.move(self.pos() + event.globalPos() - self.dragPos)
+            self.dragPos = event.globalPos()
+            event.accept()
+
+    def checked(self):
+        if self.checkBox.isChecked():
+            self.backup = True
         else:
-            self.folder_path = QtWidgets.QFileDialog.getExistingDirectory(
-                self, "Select a Folder")
+            self.backup = False
+
+    def browse(self):
+        folder_path = QtWidgets.QFileDialog.getExistingDirectory(
+            self, "Select a Folder")
+        self.comepress_folder(folder_path)
+        alert_dialog = QMessageBox.information(
+            self, "All good!", "Successfully comepressed all files/folders")
 
     def dragEnterEvent(self, event):
         if event.mimeData().hasUrls():
@@ -57,43 +110,44 @@ class MyGUI(QMainWindow):
             event.ignore()
 
     def dropEvent(self, event):
-        if mode == "files":
-            dropped_path = event.mimeData().text()
-            lines = []
-            db = QtCore.QMimeDatabase()
-            for url in event.mimeData().urls():
-                mimetype = db.mimeTypeForUrl(url)
-                if(mimetype.name() not in ["image/jpeg", "image/jpg", "image/png"]):
-                    alert_dialog = QMessageBox.warning(
-                        self, "Nope!", "You didn't drop a valid image file!")
-                    return
-                lines.append(url.toLocalFile())
-                self.comepress()
-            self.file_paths = lines
-            print(self.file_paths)
-        else:
-            dropped_path = event.mimeData().text()[7:-2]
-            print(dropped_path)
-            self.folder_path = dropped_path
-            self.comepress()
+        allowed_types = ["image/jpeg", "image/jpg",
+                         "image/png", "inode/directory"]
+        dropped_files_folders = []
+        db = QtCore.QMimeDatabase()
 
-    def comepress(self):
+        for url in event.mimeData().urls():
+            mimetype = db.mimeTypeForUrl(url)
+            if mimetype.name() in allowed_types:
+                dropped_files_folders.append(
+                    tuple([url.toLocalFile(), mimetype.name()]))
+
+        for file_folder_path in dropped_files_folders:
+            if file_folder_path[1] == "inode/directory":
+                self.comepress_folder(file_folder_path[0])
+            else:
+                self.comepress_file(file_folder_path[0])
+        alert_dialog = QMessageBox.information(
+            self, "All good!", "Successfully comepressed all files/folders")
+
+    def comepress_folder(self, folder_path):
         # Get parent folder path
-        self.parent_folder = os.path.abspath(
-            os.path.join(self.folder_path, os.pardir))
+        parent_folder = os.path.abspath(
+            os.path.join(folder_path, os.pardir))
         # Get folder name
-        self.folder_name = os.path.basename(self.folder_path)
+        folder_name = os.path.basename(folder_path)
         # Destination backup
-        if os.path.isdir(self.folder_path + "_comepress_backup"):
-            shutil.rmtree(self.folder_path + "_comepress_backup")
+        if os.path.isdir(folder_path + "_COMEPRESS"):
+            shutil.rmtree(folder_path + "_COMEPRESS")
         backup_destination = os.path.abspath(
-            self.folder_path + "_comepress_backup")
+            folder_path + "_COMEPRESS")
         # Backup folder
-        shutil.copytree(self.folder_path, backup_destination,
-                        ignore=ignore_list)
+        print(f"backup: {self.backup}")
+        if self.backup == True:
+            shutil.copytree(folder_path, backup_destination,
+                            ignore=include_patterns("*.png", "*.jpg", "*.jpeg"))
 
         # Loop through all the files in the folder
-        for root, dirs, files in os.walk(self.folder_path):
+        for root, dirs, files in os.walk(folder_path):
             for file in files:
                 # If file is an image
                 if file.endswith(tuple([".jpg", ".jpeg", ".png"])):
@@ -103,6 +157,21 @@ class MyGUI(QMainWindow):
                                    [0] + ".webp", "webp")
                     # Remove original file
                     os.remove(root + "/" + file)
+
+    def comepress_file(self, file_path):
+        # GET DETAILS
+        parent_folder = os.path.abspath(
+            os.path.join(file_path, os.pardir))
+        file_name = os.path.basename(file_path)
+        destination_path = parent_folder + "/ORIGINAL_" + file_name
+        # BACKUP
+        if self.backup:
+            shutil.copyfile(file_path, destination_path)
+        # CONVERT
+        img = Image.open(parent_folder + "/" + file_name)
+        img = img.save(parent_folder + "/" + file_name.rsplit(".", 1)
+                       [0] + ".webp", "webp")
+        os.remove(parent_folder + "/" + file_name)
 
 
 def main():

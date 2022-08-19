@@ -79,10 +79,10 @@ border: 2px solid #323134;</string>
      <widget class="QLabel" name="label_2">
       <property name="geometry">
        <rect>
-        <x>2</x>
+        <x>70</x>
         <y>170</y>
-        <width>416</width>
-        <height>21</height>
+        <width>271</width>
+        <height>41</height>
        </rect>
       </property>
       <property name="font">
@@ -99,13 +99,19 @@ background: none;
 color: #ecedec;</string>
       </property>
       <property name="text">
-       <string>Drop your folder below or click to browse...</string>
+       <string>Drag and Drop your Files or Folders here or Click to Select Files...</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
       </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
      </widget>
      <widget class="QPushButton" name="pushButton">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
       <property name="geometry">
        <rect>
         <x>0</x>
@@ -164,7 +170,7 @@ color: #ecedec;
     <widget class="QCheckBox" name="checkBox">
      <property name="geometry">
       <rect>
-       <x>180</x>
+       <x>170</x>
        <y>395</y>
        <width>151</width>
        <height>28</height>
@@ -177,10 +183,25 @@ color: #ecedec;
       </sizepolicy>
      </property>
      <property name="styleSheet">
-      <string notr="true">border: none;
-border-radius:25px;
-background:none;
-color: #ecedec;</string>
+      <string notr="true">QCheckBox {
+	border: none;
+	background:none;
+	color: #ecedec;
+}
+
+QCheckBox::indicator {
+	width: 18px;
+	height: 18px;
+}
+
+QCheckBox::indicator:checked {
+	image: url(&quot;checked.svg&quot;)
+}
+
+QCheckBox::indicator:unchecked {
+	image: url(&quot;unchecked.svg&quot;)
+}
+</string>
      </property>
      <property name="text">
       <string>Backup Original Files</string>
@@ -209,6 +230,57 @@ color: #ecedec;</string>
 border-radius: none;
 background: none;
 border-image: url(logo.png);</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="closeButton">
+     <property name="geometry">
+      <rect>
+       <x>450</x>
+       <y>15</y>
+       <width>16</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton {
+font-weight: bold;
+background: #2a2c2e;
+border: none;
+border-radius: 7px;
+background: #ff0901;
+}
+
+QPushButton:hover{ 
+	background: #A40005;
+}</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="minimizeButton">
+     <property name="geometry">
+      <rect>
+       <x>425</x>
+       <y>15</y>
+       <width>16</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton {
+font-weight: bold;
+background: #feba41;
+border: none;
+border-radius: 7px;
+}
+
+QPushButton:hover {
+	background: #C08D31;
+}</string>
+     </property>
+     <property name="text">
+      <string/>
      </property>
     </widget>
    </widget>
