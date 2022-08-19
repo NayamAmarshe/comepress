@@ -13,7 +13,7 @@ from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import *
 
 mode = "folder"  # or "folder"
-#os.chdir(sys._MEIPASS)
+os.chdir(sys._MEIPASS)
 
 def restart_program():
     python = sys.executable
