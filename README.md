@@ -51,3 +51,6 @@ pyinstaller comepress.py --add-data "./res/*:res" --onefile --icon='res/inbox_tr
 ```
 
 An executable file will be created in `dist` folder.
+
+# Contributors ⛑
+- @TGS963
