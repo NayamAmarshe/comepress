@@ -2,9 +2,10 @@
   
 # 📥 Comepress
   #### Super trivial app to optimize your web project by converting all PNG, JPG and JPEG images to Next-Gen WebP format
+    Just drag and drop your files or folders and that's it!
 ![image](https://user-images.githubusercontent.com/25067102/185523884-85b1731c-c4c7-4b90-bf39-c1eab6107a54.png)
+![comepress](https://user-images.githubusercontent.com/25067102/185751405-2dedb81b-7e40-4332-947e-decad890a87b.gif)
 
-  Just drag and drop your files or folders and that's it!
 </div>
 
 # Reduce your image bundle size by 40-80%
