@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
+ <class>Comepress</class>
  <widget class="QMainWindow" name="MainWindow">
   <property name="geometry">
    <rect>
@@ -70,7 +70,7 @@ border: 2px solid #323134;</string>
        </rect>
       </property>
       <property name="styleSheet">
-       <string notr="true">border-image: url(folder.png) 0 0 0 0 stretch stretch;</string>
+       <string notr="true">border-image: url(res/folder.png) 0 0 0 0 stretch stretch;</string>
       </property>
       <property name="interactive">
        <bool>false</bool>
@@ -164,7 +164,7 @@ color: #ecedec;
       <number>1</number>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Copyright © 2022 &lt;span style=&quot; font-weight:600;&quot;&gt;ComePress&lt;/span&gt; &lt;br/&gt; Made by &lt;span style=&quot; font-weight:600;&quot;&gt;Nayam Amarshe&lt;/span&gt;  with ⌨ and 🖱&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Copyright © 2022 &lt;span style=&quot; font-weight:600;&quot;&gt;Comepress&lt;/span&gt; &lt;br/&gt; Made by &lt;span style=&quot; font-weight:600;&quot;&gt;Nayam Amarshe&lt;/span&gt;  with ⌨ and 🖱&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
     <widget class="QCheckBox" name="checkBox">
@@ -195,11 +195,11 @@ QCheckBox::indicator {
 }
 
 QCheckBox::indicator:checked {
-	image: url(&quot;checked.svg&quot;)
+	image: url(&quot;res/checked.svg&quot;)
 }
 
 QCheckBox::indicator:unchecked {
-	image: url(&quot;unchecked.svg&quot;)
+	image: url(&quot;res/unchecked.svg&quot;)
 }
 </string>
      </property>
@@ -229,7 +229,7 @@ QCheckBox::indicator:unchecked {
       <string notr="true">border: none;
 border-radius: none;
 background: none;
-border-image: url(logo.png);</string>
+border-image: url(res/logo.png);</string>
      </property>
     </widget>
     <widget class="QPushButton" name="closeButton">

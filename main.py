@@ -1,23 +1,22 @@
 import fnmatch
-import glob
 import os
 import shutil
 import sys
 from os.path import isdir, join
-from pathlib import Path
 
 from PIL import Image
-from pynput.keyboard import Key, Listener
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import *
 
-mode = "folder"  # or "folder"
-#os.chdir(sys._MEIPASS)
+
+bundle_dir = getattr(
+    sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
+
 
 def restart_program():
     python = sys.executable
-    os.execl(python, python, * sys.argv)
+    os.execl(python, python, *sys.argv)
 
 
 def include_patterns(*patterns):
@@ -39,9 +38,9 @@ def ignore_list(path, files):
     for fileName in files:
         fullFileName = os.path.join(os.path.normpath(path), fileName)
         if (not os.path.isdir(fullFileName)
-            and not fileName.endswith('jpg')
-            and not fileName.endswith('jpeg')
-            and not fileName.endswith('png')
+                and not fileName.endswith('jpg')
+                and not fileName.endswith('jpeg')
+                and not fileName.endswith('png')
                 and not fileName.endswith('mp4')):
             filesToIgnore.append(fileName)
     return filesToIgnore
@@ -50,7 +49,8 @@ def ignore_list(path, files):
 class MyGUI(QMainWindow):
     def __init__(self):
         super(MyGUI, self).__init__()
-        uic.loadUi("comepress.ui", self)
+        uic.loadUi(os.path.abspath(
+            os.path.join(bundle_dir, "res/comepress.ui")), self)
 
         # Remove Titlebar and background
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
@@ -59,6 +59,7 @@ class MyGUI(QMainWindow):
                            border: none; 
                            color: white; 
                            }""")
+        self.setWindowIcon(QtGui.QIcon("res/inbox_tray_3d.ico"))
         # BUTTONS
         self.pushButton.clicked.connect(self.browse)
 
@@ -99,6 +100,8 @@ class MyGUI(QMainWindow):
     def browse(self):
         folder_path = QtWidgets.QFileDialog.getExistingDirectory(
             self, "Select a Folder")
+        if folder_path == '':
+            return
         self.comepress_folder(folder_path)
         alert_dialog = QMessageBox.information(
             self, "All good!", "Successfully comepressed all files/folders")
@@ -143,7 +146,7 @@ class MyGUI(QMainWindow):
             folder_path + "_COMEPRESS")
         # Backup folder
         print(f"backup: {self.backup}")
-        if self.backup == True:
+        if self.backup:
             shutil.copytree(folder_path, backup_destination,
                             ignore=include_patterns("*.png", "*.jpg", "*.jpeg"))
 
@@ -155,14 +158,14 @@ class MyGUI(QMainWindow):
                     # Convert to WebP
                     try:
                         img = Image.open(root + "/" + file)
+                        img.save(root + "/" + file.rsplit(".", 1)
+                                 [0] + ".webp", "webp")
+                        # Remove original file
+                        os.remove(root + "/" + file)
                     except:
                         alert_dialog = QMessageBox.information(
                             self, "Error!", "Please check if " + root + "/" + file + " is not corrupt")
                         return
-                    img = img.save(root + "/" + file.rsplit(".", 1)
-                                   [0] + ".webp", "webp")
-                    # Remove original file
-                    os.remove(root + "/" + file)
 
     def comepress_file(self, file_path):
         # GET DETAILS
@@ -176,17 +179,18 @@ class MyGUI(QMainWindow):
         # CONVERT
         try:
             img = Image.open(parent_folder + "/" + file_name)
+            img.save(parent_folder + "/" +
+                     file_name.rsplit(".", 1)[0] + ".webp", "webp")
+            os.remove(parent_folder + "/" + file_name)
         except:
             alert_dialog = QMessageBox.information(
                 self, "Error!", "Please check if " + parent_folder + "/" + file_name + " is not corrupt")
             return
-        img = img.save(parent_folder + "/" + file_name.rsplit(".", 1)
-                       [0] + ".webp", "webp")
-        os.remove(parent_folder + "/" + file_name)
 
 
 def main():
     app = QApplication([])
+    app.setWindowIcon(QtGui.QIcon("res/inbox_tray_3d.ico"))
     window = MyGUI()
     app.exec()
 
