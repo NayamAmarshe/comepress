@@ -52,5 +52,7 @@ pyinstaller comepress.py --add-data "./res/*:res" --onefile --icon='res/inbox_tr
 
 An executable file will be created in `dist` folder.
 
-# Contributors ⛑
-- @TGS963
+# Credits ⛑
+- [@TGS963](https://github.com/TGS963) for helping me with the project.
+- Microsoft for their open source Fluent 3D Emoji Icons.
+- Python and Qt5
