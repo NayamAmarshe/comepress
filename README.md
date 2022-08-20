@@ -5,10 +5,16 @@
 ![image](https://user-images.githubusercontent.com/25067102/185523884-85b1731c-c4c7-4b90-bf39-c1eab6107a54.png)
 
   Just drag and drop your files or folders and that's it!
-  
-  # Save up to 80% space!
-  #### That means faster site loading for users and smaller project size! 
 </div>
+
+# Reduce your image bundle size by 40-80%
+#### That means faster site loading for users and smaller project size! 
+
+## Here's a small comparison:
+| Without Comepress | With Comepress |
+|-------------------|----------------|
+|![image](https://user-images.githubusercontent.com/25067102/185750498-91c1bf0a-d094-4caf-9eda-5054a5c990dc.png)|![image](https://user-images.githubusercontent.com/25067102/185750604-d87f63e4-37da-4f36-91b8-717aaffd48b9.png)|
+# With Comepress I easily got over 43% space gain!
 
 # Installation 👨‍💻
 
