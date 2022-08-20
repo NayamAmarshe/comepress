@@ -5,7 +5,7 @@ block_cipher = None
 
 
 a = Analysis(
-    ['main.py'],
+    ['comepress.py'],
     pathex=[],
     binaries=[],
     datas=[('./res/*', 'res')],
@@ -28,7 +28,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='main',
+    name='comepress',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
