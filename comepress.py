@@ -92,10 +92,7 @@ class MyGUI(QMainWindow):
             event.accept()
 
     def checked(self):
-        if self.checkBox.isChecked():
-            self.backup = True
-        else:
-            self.backup = False
+        self.backup = bool(self.checkBox.isChecked())
 
     def browse(self):
         folder_path = QtWidgets.QFileDialog.getExistingDirectory(
@@ -122,7 +119,7 @@ class MyGUI(QMainWindow):
             mimetype = db.mimeTypeForUrl(url)
             if mimetype.name() in allowed_types:
                 dropped_files_folders.append(
-                    tuple([url.toLocalFile(), mimetype.name()]))
+                    (url.toLocalFile(), mimetype.name()))
 
         for file_folder_path in dropped_files_folders:
             if file_folder_path[1] == "inode/directory":
@@ -135,15 +132,12 @@ class MyGUI(QMainWindow):
 
     def comepress_folder(self, folder_path):
         # Get parent folder path
-        parent_folder = os.path.abspath(
-            os.path.join(folder_path, os.pardir))
         # Get folder name
         folder_name = os.path.basename(folder_path)
         # Destination backup
-        if os.path.isdir(folder_path + "_COMEPRESS"):
-            shutil.rmtree(folder_path + "_COMEPRESS")
-        backup_destination = os.path.abspath(
-            folder_path + "_COMEPRESS")
+        if os.path.isdir(f"{folder_path}_COMEPRESS"):
+            shutil.rmtree(f"{folder_path}_COMEPRESS")
+        backup_destination = os.path.abspath(f"{folder_path}_COMEPRESS")
         # Backup folder
         print(f"backup: {self.backup}")
         if self.backup:
@@ -154,17 +148,18 @@ class MyGUI(QMainWindow):
         for root, dirs, files in os.walk(folder_path):
             for file in files:
                 # If file is an image
-                if file.endswith(tuple([".jpg", ".jpeg", ".png"])):
+                if file.endswith((".jpg", ".jpeg", ".png")):
                     # Convert to WebP
                     try:
-                        img = Image.open(root + "/" + file)
-                        img.save(root + "/" + file.rsplit(".", 1)
-                                 [0] + ".webp", "webp")
+                        img = Image.open(f"{root}/{file}")
+                        img.save(
+                            (f"{root}/{file.rsplit('.', 1)[0]}.webp", "webp"))
                         # Remove original file
-                        os.remove(root + "/" + file)
-                    except:
+                        os.remove(f"{root}/{file}")
+                    except Exception:
                         alert_dialog = QMessageBox.information(
-                            self, "Error!", "Please check if " + root + "/" + file + " is not corrupt")
+                            self, "Error!", f"Please check if {root}/{file} is not corrupt")
+
                         return
 
     def comepress_file(self, file_path):
@@ -172,19 +167,19 @@ class MyGUI(QMainWindow):
         parent_folder = os.path.abspath(
             os.path.join(file_path, os.pardir))
         file_name = os.path.basename(file_path)
-        destination_path = parent_folder + "/ORIGINAL_" + file_name
+        destination_path = f"{parent_folder}/ORIGINAL_{file_name}"
         # BACKUP
         if self.backup:
             shutil.copyfile(file_path, destination_path)
         # CONVERT
         try:
-            img = Image.open(parent_folder + "/" + file_name)
-            img.save(parent_folder + "/" +
-                     file_name.rsplit(".", 1)[0] + ".webp", "webp")
-            os.remove(parent_folder + "/" + file_name)
-        except:
+            img = Image.open(f"{parent_folder}/{file_name}")
+            img.save(
+                ((f"{parent_folder}/" + file_name.rsplit(".", 1)[0]) + ".webp"), "webp")
+            os.remove(f"{parent_folder}/{file_name}")
+        except Exception:
             alert_dialog = QMessageBox.information(
-                self, "Error!", "Please check if " + parent_folder + "/" + file_name + " is not corrupt")
+                self, "Error!", f"Please check if {parent_folder}/{file_name} is not corrupt")
             return
 
 
