@@ -29,7 +29,7 @@
 
 Coming Soon
 
-## Windows 🐌
+## Windows 🔳
 
 Coming Soon
 
