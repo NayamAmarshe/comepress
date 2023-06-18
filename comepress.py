@@ -10,8 +10,7 @@ from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import *
 
 
-bundle_dir = getattr(
-    sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
+bundle_dir = getattr(sys, "_MEIPASS", os.path.abspath(os.path.dirname(__file__)))
 
 
 def restart_program():
@@ -23,8 +22,9 @@ def include_patterns(*patterns):
     def _ignore_patterns(path, all_names):
         # Determine names which match one or more patterns (that shouldn't be
         # ignored).
-        keep = (name for pattern in patterns
-                for name in fnmatch.filter(all_names, pattern))
+        keep = (
+            name for pattern in patterns for name in fnmatch.filter(all_names, pattern)
+        )
         # Ignore file names which *didn't* match any of the patterns given that
         # aren't directory names.
         dir_names = (name for name in all_names if isdir(join(path, name)))
@@ -37,11 +37,13 @@ def ignore_list(path, files):
     filesToIgnore = []
     for fileName in files:
         fullFileName = os.path.join(os.path.normpath(path), fileName)
-        if (not os.path.isdir(fullFileName)
-                and not fileName.endswith('jpg')
-                and not fileName.endswith('jpeg')
-                and not fileName.endswith('png')
-                and not fileName.endswith('mp4')):
+        if (
+            not os.path.isdir(fullFileName)
+            and not fileName.endswith("jpg")
+            and not fileName.endswith("jpeg")
+            and not fileName.endswith("png")
+            and not fileName.endswith("mp4")
+        ):
             filesToIgnore.append(fileName)
     return filesToIgnore
 
@@ -49,16 +51,17 @@ def ignore_list(path, files):
 class MyGUI(QMainWindow):
     def __init__(self):
         super(MyGUI, self).__init__()
-        uic.loadUi(os.path.abspath(
-            os.path.join(bundle_dir, "res/comepress.ui")), self)
+        uic.loadUi(os.path.abspath(os.path.join(bundle_dir, "res/comepress.ui")), self)
 
         # Remove Titlebar and background
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-        self.setStyleSheet("""QToolTip { 
+        self.setStyleSheet(
+            """QToolTip { 
                            border: none; 
                            color: white; 
-                           }""")
+                           }"""
+        )
         self.setWindowIcon(QtGui.QIcon("res/inbox_tray_3d.ico"))
         # BUTTONS
         self.pushButton.clicked.connect(self.browse)
@@ -74,11 +77,17 @@ class MyGUI(QMainWindow):
         self.minimizeButton.setToolTip("Minimize")
         self.minimizeButton.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
 
+        self.comboBox.activated.connect(self.comboBoxSelected)
+
+        self.horizontalSlider.valueChanged.connect(self.horizontalSliderChanged)
         self.setAcceptDrops(True)
 
         # DEFAULT VARIABLES
         self.backup = True
         self.dragPos = QtCore.QPoint()
+        self.quality = 100
+        self.percentageLabel.setText(f"{self.quality}")
+        self.format = "JPG"
 
         self.show()
 
@@ -96,12 +105,21 @@ class MyGUI(QMainWindow):
 
     def browse(self):
         folder_path = QtWidgets.QFileDialog.getExistingDirectory(
-            self, "Select a Folder")
-        if folder_path == '':
+            self, "Select a Folder"
+        )
+        if folder_path == "":
             return
         self.comepress_folder(folder_path)
         alert_dialog = QMessageBox.information(
-            self, "All good!", "Successfully comepressed all files/folders")
+            self, "All good!", "Successfully comepressed all files/folders"
+        )
+
+    def comboBoxSelected(self):
+        self.format = self.comboBox.currentText()
+
+    def horizontalSliderChanged(self):
+        self.percentageLabel.setText(f"{self.horizontalSlider.value()}")
+        self.quality = self.horizontalSlider.value()
 
     def dragEnterEvent(self, event):
         if event.mimeData().hasUrls():
@@ -110,16 +128,14 @@ class MyGUI(QMainWindow):
             event.ignore()
 
     def dropEvent(self, event):
-        allowed_types = ["image/jpeg", "image/jpg",
-                         "image/png", "inode/directory"]
+        allowed_types = ["image/jpeg", "image/jpg", "image/png", "inode/directory"]
         dropped_files_folders = []
         db = QtCore.QMimeDatabase()
 
         for url in event.mimeData().urls():
             mimetype = db.mimeTypeForUrl(url)
             if mimetype.name() in allowed_types:
-                dropped_files_folders.append(
-                    (url.toLocalFile(), mimetype.name()))
+                dropped_files_folders.append((url.toLocalFile(), mimetype.name()))
 
         for file_folder_path in dropped_files_folders:
             if file_folder_path[1] == "inode/directory":
@@ -128,7 +144,8 @@ class MyGUI(QMainWindow):
             else:
                 self.comepress_file(file_folder_path[0])
         alert_dialog = QMessageBox.information(
-            self, "All good!", "Successfully comepressed all files/folders")
+            self, "All good!", "Successfully comepressed all files/folders"
+        )
 
     def comepress_folder(self, folder_path):
         # Get parent folder path
@@ -141,31 +158,44 @@ class MyGUI(QMainWindow):
         # Backup folder
         print(f"backup: {self.backup}")
         if self.backup:
-            shutil.copytree(folder_path, backup_destination,
-                            ignore=include_patterns("*.png", "*.jpg", "*.jpeg"))
+            shutil.copytree(
+                folder_path,
+                backup_destination,
+                ignore=include_patterns("*.png", "*.jpg", "*.jpeg"),
+            )
 
         # Loop through all the files in the folder
-        for root, dirs, files in os.walk(folder_path):
+        for root, dirs, files in os.walk(
+            folder_path,
+        ):
             for file in files:
                 # If file is an image
-                if file.endswith((".jpg", ".jpeg", ".png")):
+                if file.endswith((".jpg", ".jpeg", ".png", ".webp")):
                     # Convert to WebP
                     try:
                         img = Image.open(f"{root}/{file}")
                         img.save(
-                            (f"{root}/{file.rsplit('.', 1)[0]}.webp", "webp"))
+                            (
+                                f"{root}/{file.rsplit('.', 1)[0]}.{self.format}",
+                                self.format,
+                            ),
+                            quality=self.quality,
+                            optimize=(self.quality < 100),
+                        )
                         # Remove original file
                         os.remove(f"{root}/{file}")
                     except Exception:
                         alert_dialog = QMessageBox.information(
-                            self, "Error!", f"Please check if {root}/{file} is not corrupt")
+                            self,
+                            "Error!",
+                            f"Please check if {root}/{file} is not corrupt",
+                        )
 
                         return
 
     def comepress_file(self, file_path):
         # GET DETAILS
-        parent_folder = os.path.abspath(
-            os.path.join(file_path, os.pardir))
+        parent_folder = os.path.abspath(os.path.join(file_path, os.pardir))
         file_name = os.path.basename(file_path)
         destination_path = f"{parent_folder}/ORIGINAL_{file_name}"
         # BACKUP
@@ -175,11 +205,15 @@ class MyGUI(QMainWindow):
         try:
             img = Image.open(f"{parent_folder}/{file_name}")
             img.save(
-                ((f"{parent_folder}/" + file_name.rsplit(".", 1)[0]) + ".webp"), "webp")
+                ((f"{parent_folder}/" + file_name.rsplit(".", 1)[0]) + ".webp"), "webp"
+            )
             os.remove(f"{parent_folder}/{file_name}")
         except Exception:
             alert_dialog = QMessageBox.information(
-                self, "Error!", f"Please check if {parent_folder}/{file_name} is not corrupt")
+                self,
+                "Error!",
+                f"Please check if {parent_folder}/{file_name} is not corrupt",
+            )
             return
 
 

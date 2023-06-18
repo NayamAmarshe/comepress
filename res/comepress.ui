@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Comepress</class>
+ <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
   <property name="geometry">
    <rect>
@@ -27,9 +27,15 @@
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">background: #28262b;
+     <string notr="true">QFrame {
+background: #28262b;
 border-radius: 25px;
-border: 2px solid #65606C;</string>
+border: 2px solid #65606C;
+}
+
+QHBoxLayout {
+	border: none;
+}</string>
     </property>
     <property name="frameShape">
      <enum>QFrame::StyledPanel</enum>
@@ -171,7 +177,7 @@ color: #ecedec;
      <property name="geometry">
       <rect>
        <x>170</x>
-       <y>395</y>
+       <y>490</y>
        <width>151</width>
        <height>28</height>
       </rect>
@@ -282,6 +288,138 @@ QPushButton:hover {
      <property name="text">
       <string/>
      </property>
+    </widget>
+    <widget class="QWidget" name="horizontalLayoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>440</y>
+       <width>221</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLabel" name="label_4">
+        <property name="styleSheet">
+         <string notr="true">border: none;
+color: #fff;</string>
+        </property>
+        <property name="text">
+         <string>Quality</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSlider" name="horizontalSlider">
+        <property name="styleSheet">
+         <string notr="true">QSlider {
+	border: none;
+	border-radius:5px;
+}
+QSlider::groove:horizontal {
+    height: 10px; 
+    background: #404040;
+	border-radius:5px;
+}
+
+QSlider::handle:horizontal {
+    background: #7e22ce;
+    width: 18px;
+    margin: -4px 0; 
+    border-radius: 9px;
+}
+
+QSlider::add-page:horizontal {
+    background: #404040;
+	border-radius:5px;
+
+}
+
+QSlider::sub-page:horizontal {
+    background: #7e22ce;
+	border-radius:5px;
+
+}</string>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>100</number>
+        </property>
+        <property name="value">
+         <number>100</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="percentageLabel">
+        <property name="styleSheet">
+         <string notr="true">border: none;
+color: #fff;</string>
+        </property>
+        <property name="text">
+         <string>90</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="horizontalLayoutWidget_2">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>400</y>
+       <width>221</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="styleSheet">
+         <string notr="true">border: none;
+border-radius: none;
+background: none;
+color: #ecedec;</string>
+        </property>
+        <property name="text">
+         <string>Output Format</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="comboBox">
+        <property name="styleSheet">
+         <string notr="true">QComboBox{
+background: #28262b;
+border: 2px solid #65606C;
+color: #fff;
+border-radius:6px;
+}</string>
+        </property>
+        <item>
+         <property name="text">
+          <string>JPG</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>PNG</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>WEBP</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </widget>
   </widget>
